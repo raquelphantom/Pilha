@@ -66,35 +66,50 @@ int 		tamanho (PILHA* p);
 bool 		estaVazia(PILHA* p); 
 void 		exibirPilha (PILHA* p); 
 void 		reinicializarPilha (PILHA* p);
+bool 		inserirElemPilha(PILHA* p, REGISTRO reg); 
 void 		excluiDaPilha (PILHA* p); 
 bool 		excluirElemPilha(PILHA* p, REGISTRO* reg); 
-void 		mostrar(REGISTRO* carga);
-void 		bubble_sort(REGISTRO* carga);
+void 		mostrar(void);
+void 		bubble_sort(void);
 
-void mostrar(REGISTRO* carga){
+void mostrar(void){
 	int i;
 	for(i=0; i<TAMANHO_VETOR; i++)
-		printf("%i",carga[i]->PESO);
+		printf("%i",carga[i].PESO);
 }
 
-void bubble_sort(REGISTRO* carga) 
-{
+void bubble_sort(void) 
+{ 
+	mostrar();
   int i, j; int aux;
   for ( j = 0; j<TAMANHO_VETOR-1; j++) 
   {
     for ( i = 0; i<TAMANHO_VETOR-1-j; i++) 
     {
-      if ( carga.PESO[i] < carga.PESO[i+1])//esse cara nessa posição é maior que a do lado?
+      if ( carga[i].PESO < carga[i+1].PESO)//esse cara nessa posição é maior que a do lado?
       {
-         aux 	   = carga.PESO[i];//guarda valor pra não sobrescrever dados
-	carga.PESO[i] 	   = carga.PESO[i+1];//troca de lugar
-	carga.PESO[i+1]  = aux;//troca de lugar pt2
+         aux 	   = carga[i].PESO;//guarda valor pra não sobrescrever dados
+	carga[i] .PESO	   = carga[i+1].PESO;//troca de lugar
+	carga[i+1].PESO  = aux;//troca de lugar pt2
       }
     }
    }
+   mostrar();
 }
-
-
+/*
+void addToPilha(PILHA* p, REGISTRO* reg){
+	int i;
+	for(i=0; i<TAMANHO_VETOR; i++)
+	{
+		reg->chave = carga[i].chave;
+		reg->DESCRITIVO = carga[i].DESCRITIVO;
+		reg->PESO = carga[i].PESO;
+		reg->QTD = carga[i].QTD;
+		reg->UNIDADE = carga[i].UNIDADE;
+		bool inserirElemPilha(PILHA* p, REGISTRO* reg);
+	}
+}
+*/
 void inicializarPilha (PILHA* p)
 {
   p->topo = NULL;
@@ -116,6 +131,35 @@ bool estaVazia(PILHA* p)
    if (p->topo == NULL) 
       return true;  
    return false;
+}
+
+void insereNaPilha (PILHA* p)
+{	
+	int i;
+	for(i=0; i<TAMANHO_VETOR; i++){
+	REGISTRO	elem;
+	elem  = carga[i];
+	if ( inserirElemPilha(p, elem) == true )
+	   printf ("\nChave [%i] inserida com sucesso.", elem.chave );
+	else
+	   printf ("\nChave [%i] NÃO inserida!", elem.chave );
+	}
+}
+
+bool inserirElemPilha(PILHA* p, REGISTRO reg) 
+{  
+   PONT novo  = (PONT) malloc(sizeof(ELEMENTO)); 
+   if (novo==NULL)
+   {
+      printf ("\nErro ao alocar memória para novo elemento.");
+      printf ("\nNão foi possível inserir na pilha!");
+      getch();
+      return false;
+   } 
+   novo->reg  = reg;
+   novo->PROX = p->topo;  
+   p->topo    = novo;  
+   return true;
 }
 
 void exibirPilha (PILHA* p) 
@@ -143,17 +187,7 @@ bool excluirElemPilha(PILHA* p, REGISTRO* reg)
 }
 
 void reinicializarPilha (PILHA* p) 
-{  /*
-   PONT apagar;
-   PONT posicao = p->topo;  
-   while (posicao != NULL) 
-   {
-      apagar  = posicao;  
-      posicao = posicao->PROX;  
-      free(apagar);
-   }
-   p->topo = NULL;
-   */
+{ 
    REGISTRO regExcluido;
    bool     flag;
    do
@@ -166,9 +200,10 @@ void reinicializarPilha (PILHA* p)
 void excluiDaPilha (PILHA* p)
 {	REGISTRO regExcluido;
  	if ( excluirElemPilha(p, &regExcluido) == true )
-	   printf ("\nRegistro: [%i][%s][%s][%s][%i][%i] excluído com sucesso.", regExcluido.chave, regExcluido.DESCRITIVO,regExcluido.UNIDADE,regExcluido.QTD,regExcluido.PESO);
+	   printf ("\nRegistro: [%i][%s][%s][%i][%i] excluído com sucesso.", regExcluido.chave, regExcluido.DESCRITIVO,regExcluido.UNIDADE,regExcluido.QTD,regExcluido.PESO);
 	else
 	   printf ("\nNão foi possivel excluir o registro.");
+	
 }
 
 /* ---------------------------------- CORPO DO PROGRAMA ------------------------------------ */
@@ -178,7 +213,8 @@ int main (void)
    
    char opc;
    setlocale(LC_ALL, "");
-   
+   bubble_sort();
+   getch();
    do
    {    system ("color e0");
    		system ("cls");
@@ -190,6 +226,7 @@ int main (void)
    		printf ("\n 4. Verificar se a pilha está vazia ");
    		printf ("\n 5. Excluir elemento da Pilha (pop) ");
    		printf ("\n 6. Reinicializa Pilha              ");
+   		printf ("\n 7. adcionar vetor a pilha          ");
    		printf ("\n------------------------------------");
    		printf ("\n    Escolha: "); fflush (stdin); opc = getche();
    		
@@ -203,6 +240,7 @@ int main (void)
 					  else printf ("\nPilha NÃO vazia");		            break;
    	    	case '5': excluiDaPilha (&pil);									break;
    	    	case '6': reinicializarPilha (&pil);							break;
+   	    	case '7': insereNaPilha (&pil);									break;
 		}
 
 		printf ("\n\nNovo teste? [n/N = não]"); fflush (stdin); opc = getche();
